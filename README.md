@@ -15,29 +15,35 @@ Full-stack application with JWT Authentication, Progressive Web App (PWA) featur
 docker compose up -d
 ```
 
-### 2. Basic Setup (Run inside PHP container)
+### 2. Backend Setup (PHP Container)
 All Symfony commands **must** be executed inside the `php` container:
 
 ```bash
 # Install PHP dependencies
 docker compose exec php composer install
 
-# Initialize Database (SQLite)
+# Initialize Database
 docker compose exec php php bin/console doctrine:database:create
-docker compose compose exec php php bin/console doctrine:schema:update --force
+docker compose exec php php bin/console doctrine:schema:update --force
 
 # Generate JWT keys
 docker compose exec php php bin/console lexik:jwt:generate-keypair
 ```
 
-### 3. Frontend Build
-The frontend should be built using Node v20.8.0:
+### 3. Frontend Development & Build (Node Container)
+Use the `node` container for all frontend operations:
+
 ```bash
-cd frontend
-npm install
-npm run build
+# Install frontend dependencies (first time)
+docker compose exec node npm install
+
+# Run Development Server (with hot-reload)
+docker compose exec node npm run dev -- --host
+
+# Build for Production
+docker compose exec node npm run build
 ```
-*Note: Compiled assets will be placed in `public/build` and served by Symfony.*
+*Note: Compiled assets will be placed in `public/build` and served by Symfony/Nginx.*
 
 ## 📱 PWA & Push Notifications
 
@@ -46,7 +52,7 @@ npm run build
 2. Configure PWA manifest in `frontend/vite.config.js`.
 3. Build frontend after any changes to manifest or icons.
 
-### Testing Push (inside container)
+### Testing Push (inside PHP container)
 ```bash
 docker compose exec php php bin/console app:send-push user@example.com
 ```
@@ -59,6 +65,7 @@ docker compose exec php php bin/console app:send-push user@example.com
 - **Static Assets:** Served directly from `/public/build`.
 
 ## 🛠️ Typical Workflow
-1. Make changes in `frontend/`.
-2. Run `npm run build` (or `npm run dev` for rapid testing with proxy).
-3. Access Symfony app (Nginx root should point to `/public`).
+1. Start development server: `docker compose exec node npm run dev -- --host`.
+2. Make changes in `frontend/src`.
+3. For production, run `docker compose exec node npm run build`.
+4. Access the app via `http://localhost:91`.
