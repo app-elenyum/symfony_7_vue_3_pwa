@@ -1,4 +1,9 @@
-/* Service Worker for PWA - Diagnostic Version */
+import { precacheAndRoute } from 'workbox-precaching'
+
+// This is the magic line that VitePWA needs to inject the precache manifest
+precacheAndRoute(self.__WB_MANIFEST)
+
+/* Service Worker for PWA - Stable Version */
 
 self.addEventListener('push', (event) => {
   console.log('[SW] Push Received.');
@@ -12,13 +17,9 @@ self.addEventListener('push', (event) => {
   if (event.data) {
     try {
       data = event.data.json();
-      console.log('[SW] Push Data Parsed:', data);
     } catch (e) {
       data.body = event.data.text();
-      console.log('[SW] Push Data (Text):', data.body);
     }
-  } else {
-    console.log('[SW] Push event had no data.');
   }
 
   const options = {
@@ -31,16 +32,8 @@ self.addEventListener('push', (event) => {
     }
   };
 
-  console.log('[SW] Attempting to showNotification:', data.title);
-
   event.waitUntil(
     self.registration.showNotification(data.title, options)
-      .then(() => {
-        console.log('[SW] showNotification resolved successfully.');
-      })
-      .catch((error) => {
-        console.error('[SW] showNotification failed:', error);
-      })
   );
 });
 

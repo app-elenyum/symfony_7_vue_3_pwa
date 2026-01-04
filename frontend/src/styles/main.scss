@@ -1,5 +1,7 @@
-// Import Bootstrap and Icons
-@import 'bootstrap/scss/bootstrap';
-@import 'bootstrap-icons/font/bootstrap-icons.css';
+// Modern Sass syntax
+@use "bootstrap/scss/bootstrap";
+@use "bootstrap-icons/font/bootstrap-icons.css";
 
-// Your custom styles can go here
+body {
+  background-color: #f8f9fa;
+}

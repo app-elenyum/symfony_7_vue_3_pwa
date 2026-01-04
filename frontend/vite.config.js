@@ -5,16 +5,14 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
     vueDevTools(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Switch back to generateSW for simpler debugging unless injectManifest is strictly needed
-      // Actually, keep injectManifest but ensure it works.
       strategies: 'injectManifest',
-      srcDir: 'public',
+      srcDir: 'src',
       filename: 'sw.js',
       injectRegister: 'inline',
       manifest: {
@@ -49,6 +47,27 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+        quietDeps: true,
+        silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function', 'mixed-decls']
+      }
+    }
+  },
+  root: './',
+  base: mode === 'development' ? '/' : '/build/',
+  build: {
+    outDir: '../public/build',
+    emptyOutDir: true,
+    manifest: true,
+    rollupOptions: {
+      input: {
+        app: 'index.html',
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': {
@@ -57,4 +76,4 @@ export default defineConfig({
       },
     }
   }
-})
+}))
